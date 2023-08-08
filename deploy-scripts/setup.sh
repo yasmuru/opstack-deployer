@@ -160,3 +160,42 @@ create_file_name_format() {
 file_name_format=$(create_file_name_format "$CHAIN_NAME")
 
 echo "$json_data" > "$output_location/$file_name_format.json"
+
+cd packages/contracts-bedrock/
+cp -n .envrc.example .envrc
+
+
+# Function to load .envrc files in a directory 
+update_env_variable() {
+    local variable_name="$1"
+    local new_value="$2"
+
+    # Check if the variable exists in the .envrc file
+    if grep -q "^export $variable_name=" .envrc; then
+        # Variable exists, update its value using sed
+        awk -v var="$variable_name" -v val="$new_value" 'BEGIN {FS=OFS="="} $1 == "export " var {$2 = val} 1' .envrc > .envrc.tmp && mv .envrc.tmp .envrc
+    else
+        # Variable does not exist, add it to the .envrc file
+        echo "export $variable_name=$new_value" >> .envrc
+    fi
+}
+
+update_env_variable "ETH_RPC_URL" "$ETH_RPC_URL"
+update_env_variable "DEPLOYMENT_CONTEXT" "$file_name_format"
+update_env_variable "PRIVATE_KEY" "$ADMIN_PRIVATE_KEY"
+update_env_variable "L1_RPC" "$ETH_RPC_URL"
+update_env_variable "RPC_KIND" "$RPC_KIND"
+
+export ETH_RPC_URL=$ETH_RPC_URL
+export DEPLOYMENT_CONTEXT=$file_name_format
+export PRIVATE_KEY=$ADMIN_PRIVATE_KEY
+export L1_RPC=$ETH_RPC_URL
+export RPC_KIND=$RPC_KIND
+
+source ~/.bashrc
+direnv allow .
+
+echo "Deploying L1 contracts"
+mkdir deployments/$file_name_format
+forge script scripts/Deploy.s.sol:Deploy --private-key $PRIVATE_KEY --broadcast --rpc-url $ETH_RPC_URL
+forge script scripts/Deploy.s.sol:Deploy --sig 'sync()' --private-key $PRIVATE_KEY --broadcast --rpc-url $ETH_RPC_URL
