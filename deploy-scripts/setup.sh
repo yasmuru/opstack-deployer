@@ -199,3 +199,92 @@ echo "Deploying L1 contracts"
 mkdir deployments/$file_name_format
 forge script scripts/Deploy.s.sol:Deploy --private-key $PRIVATE_KEY --broadcast --rpc-url $ETH_RPC_URL
 forge script scripts/Deploy.s.sol:Deploy --sig 'sync()' --private-key $PRIVATE_KEY --broadcast --rpc-url $ETH_RPC_URL
+
+# Run op-node
+echo "Generating L2 config files"
+cd ../../op-node/
+
+go run cmd/main.go genesis l2 \
+    --deploy-config ../packages/contracts-bedrock/deploy-config/$file_name_format.json \
+    --deployment-dir ../packages/contracts-bedrock/deployments/$file_name_format/ \
+    --outfile.l2 genesis.json \
+    --outfile.rollup rollup.json \
+    --l1-rpc $ETH_RPC_URL
+
+# Set Up op-geth
+
+openssl rand -hex 32 > jwt.txt
+cp -n genesis.json ../../op-geth/
+cp -n jwt.txt ../../op-geth/
+cp -n ../packages/contracts-bedrock/.envrc ../../op-geth/
+
+# Initialize op-geth
+echo "Initializing op-geth"
+cd ../../op-geth/
+mkdir datadir
+build/bin/geth init --datadir=datadir genesis.json
+direnv allow .
+
+
+# Run op-geth
+echo "Running the node software"
+
+nohup ./build/bin/geth --datadir ./datadir --http --http.corsdomain="*" --http.vhosts="*" --http.addr=0.0.0.0 --http.api=web3,debug,eth,txpool,net,engine --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.origins="*" --ws.api=debug,eth,txpool,net,engine --syncmode=full --gcmode=archive --nodiscover --maxpeers=0 --networkid=$CHAIN_ID --authrpc.vhosts="*" --authrpc.addr=0.0.0.0 --authrpc.port=8551 --authrpc.jwtsecret=./jwt.txt --rollup.disabletxpoolgossip=true &
+
+
+# Setting up op-node env
+cp -n .envrc ../optimism/op-node/
+cd ../optimism/op-node
+
+update_env_variable "SEQ_KEY" "$SEQUENCER_PRIVATE_KEY"
+update_env_variable "BATCHER_KEY" "$BATCHER_PRIVATE_KEY"
+
+export SEQ_KEY=$SEQUENCER_PRIVATE_KEY
+export BATCHER_KEY=$BATCHER_PRIVATE_KEY
+
+direnv allow .
+
+
+# Run op-node
+
+nohup ./bin/op-node 	--l2=http://localhost:8551 	--l2.jwt-secret=./jwt.txt 	--sequencer.enabled 	--sequencer.l1-confs=3 	--verifier.l1-confs=3 	--rollup.config=./rollup.json 	--rpc.addr=0.0.0.0 	--rpc.port=8547 	--p2p.disable 	--rpc.enable-admin 	--p2p.sequencer.key=$SEQ_KEY 	--l1=$ETH_RPC_URL 	--l1.rpckind=$RPC_KIND &
+
+
+# setting up op-batcher
+cp -n .envrc ../op-batcher
+cd ../op-batcher
+direnv allow .
+
+# Run op-batcher
+echo "Running Batcher"
+nohup ./bin/op-batcher     --l2-eth-rpc=http://localhost:8545     --rollup-rpc=http://localhost:8547     --poll-interval=1s     --sub-safety-margin=6     --num-confirmations=1     --safe-abort-nonce-too-low-count=3     --resubmission-timeout=30s     --rpc.addr=0.0.0.0     --rpc.port=8548     --rpc.enable-admin     --max-channel-duration=1     --l1-eth-rpc=$L1_RPC     --private-key=$BATCHER_KEY &
+
+
+# Setting up op-proposer
+
+cp -n .envrc ../op-proposer
+cd ../op-proposer
+
+json_file="/var/optimism/packages/contracts-bedrock/deployments/$file_name_format/L2OutputOracleProxy.json"
+param_name="address"
+l2oo_addr=$(jq -r ".$param_name" "$json_file")
+
+update_env_variable "PROPOSER_KEY" "$PROPOSER_PRIVATE_KEY"
+update_env_variable "L2OO_ADDR" "$l2oo_addr"
+
+# sets Propose private key
+export PROPOSER_KEY=$PROPOSER_PRIVATE_KEY
+
+# sets address of L2OutputOracleProxy
+export L2OO_ADDR=$l2oo_addr
+
+direnv allow .
+
+
+# Run op-proposer
+echo "Running Proposer"
+
+nohup ./bin/op-proposer     --poll-interval=12s     --rpc.port=8560     --rollup-rpc=http://localhost:8547     --l2oo-address=$L2OO_ADDR     --private-key=$PROPOSER_KEY     --l1-eth-rpc=$L1_RPC &
+
+echo "Your OPStack chain $CHAIN_NAME created successfully"
+echo "RPC is running in the PORT 8545"
