@@ -24,7 +24,7 @@ dist-ssr
 .DS_Store
 \*.pem
 *.local
-
+*.vscode/
 # debug
 
 npm-debug.log*
