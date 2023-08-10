@@ -1,0 +1,9 @@
+version: '3'
+services:
+  opstack-deployer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./deploy-scripts/setup.sh:/app/setup.sh
+    command: /app/setup.sh
