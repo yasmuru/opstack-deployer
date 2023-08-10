@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "lint": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "wagmi": "wagmi generate"
+    "wagmi": "wagmi generate",
+    "postinstall": "mkdir -pv public && cp node_modules/@trustwallet/wallet-core/dist/lib/wallet-core.* public"
   },
   "dependencies": {
     "@eth-optimism/atst": "^0.0.0-20230306200511",
@@ -23,8 +24,10 @@
     "@openzeppelin/contracts": "4.7.3",
     "@openzeppelin/contracts-upgradeable": "4.7.3",
     "@rainbow-me/rainbowkit": "^1.0.7",
+    "@trustwallet/wallet-core": "^3.2.10",
     "@wagmi/cli": "^1.3.0",
     "buffer": "^6.0.3",
+    "jotai": "^2.3.1",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -1,4 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { initWasm } from "@trustwallet/wallet-core";
+import { Wallet } from '../utils/wallet'
+import { useAtom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils';
+
+const getAddress = async () => {
+  const walletCore = await initWasm();
+  const admin = new Wallet(walletCore);
+  const proposer = new Wallet(walletCore);
+  const batcher = new Wallet(walletCore);
+  const sequencer = new Wallet(walletCore);
+
+  const adminAddr = await admin.createAccount();
+  const proposerAddr = await proposer.createAccount();
+  const batcherAddr = await batcher.createAccount();
+  const sequencerAddr = await sequencer.createAccount();
+  return {
+    admin: adminAddr,
+    proposer: proposerAddr,
+    batcher: batcherAddr,
+    sequencer: sequencerAddr
+  }
+};
+
+
+const addressFromStorage = atomWithStorage('address', await getAddress());
 
 
 function Setup() {
@@ -59,10 +85,11 @@ const FooterButtons = ({ onNext, onBack, onReset, currStep }: any) => {
 };
 
 function Step1() {
+  const [address, setAddress] = useAtom(addressFromStorage);
   return (
     <>
       <div className="mx-48">
-        <h1 className="text-bold text-2xl my-5" >Initial Setup</h1>
+        <h1 className="text-bold text-2xl my-5">Initial Setup</h1>
         <div className="bg-white rounded p-6 shadow-md grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="w-full ">
             <label htmlFor="input1" className="block mb-1">Chain Id
@@ -85,11 +112,11 @@ function Step1() {
             <div className="w-full ">
               <label htmlFor="input1" className="block mb-1">Admin Public Address
               </label>
-              <input type="text" id="input1" className=" w-full rounded  border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 1" />
+              <input value={address.admin.publicAddr} type="text" id="input1" className=" w-full rounded  border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 1" />
             </div>
             <div className="w-full ">
               <label htmlFor="input2" className="block mb-1">Admin Private Key</label>
-              <input type="text" id="input2" className=" w-full rounded border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 2" />
+              <input value={address.admin.privateKey} type="text" id="input2" className=" w-full rounded border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 2" />
             </div>
           </div>
           <p className="pb-4 p-2">Recommended ETH for Admin: <b>2 ETH</b></p>
@@ -98,11 +125,11 @@ function Step1() {
             <div className="w-full ">
               <label htmlFor="input1" className="block mb-1">Sequencer Public Address
               </label>
-              <input type="text" id="input1" className=" w-full rounded  border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 1" />
+              <input value={address.sequencer.publicAddr} type="text" id="input1" className=" w-full rounded  border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 1" />
             </div>
             <div className="w-full ">
               <label htmlFor="input2" className="block mb-1">Sequencer Private Key</label>
-              <input type="text" id="input2" className="  w-full rounded border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 2" />
+              <input value={address.sequencer.privateKey} type="text" id="input2" className="  w-full rounded border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 2" />
             </div>
           </div>
           <hr />
@@ -110,11 +137,11 @@ function Step1() {
             <div className="w-full ">
               <label htmlFor="input1" className="block mb-1">Proposer Public Address
               </label>
-              <input type="text" id="input1" className=" w-full rounded  border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 1" />
+              <input value={address.proposer.publicAddr} type="text" id="input1" className=" w-full rounded  border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 1" />
             </div>
             <div className="w-full ">
               <label htmlFor="input2" className="block mb-1">Proposer Private Key</label>
-              <input type="text" id="input2" className="  w-full rounded border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 2" />
+              <input value={address.proposer.privateKey} type="text" id="input2" className="  w-full rounded border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 2" />
             </div>
           </div>
           <p className="pb-4 p-2" >Recommended ETH for Proposer: <b>5 ETH</b></p>
@@ -124,11 +151,11 @@ function Step1() {
             <div className="w-full ">
               <label htmlFor="input1" className="block mb-1">Batcher Public Address
               </label>
-              <input type="text" id="input1" className=" w-full rounded  border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 1" />
+              <input value={address.batcher.publicAddr} type="text" id="input1" className=" w-full rounded  border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 1" />
             </div>
             <div className="w-full ">
               <label htmlFor="input2" className="block mb-1">Batcher Private Key</label>
-              <input type="text" id="input2" className="  w-full rounded border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 2" />
+              <input value={address.batcher.privateKey} type="text" id="input2" className="  w-full rounded border-grey-300 border-2 focus:border-blue-500 focus:ring focus:ring-blue-200 p-4" placeholder="Input 2" />
             </div>
           </div>
           <p>Recommended ETH for Batcher: <b>10 ETH</b></p>
