@@ -3,6 +3,8 @@
 # Enable "exit on error" and "pipefail" mode
 set -eo pipefail
 
+export PATH="$PATH:$HOME/.foundry/bin"
+
 # Function to check if a required parameter is missing
 function check_parameter {
     if [ -z "$2" ]; then
