@@ -3,6 +3,74 @@
 # Enable "exit on error" and "pipefail" mode
 set -eo pipefail
 
+# Update package lists
+sudo apt update -y
+
+# Install build essentials
+sudo apt install -y build-essential
+
+# Install required packages
+sudo apt install -y git curl make jq
+
+
+if command -v go >/dev/null 2>&1; then
+    echo 'go installed alreay'
+else 
+    # Download and install Go
+    echo 'Installing Go...'
+    wget https://go.dev/dl/go1.20.linux-amd64.tar.gz
+    tar xvzf go1.20.linux-amd64.tar.gz
+    sudo cp -n go/bin/go /usr/bin/go
+    sudo mv -n go /usr/lib
+    export GOROOT=/usr/lib/go
+    echo 'export GOROOT=/usr/lib/go' >> ~/.bashrc
+    source ~/.bashrc
+fi
+
+
+# Install Node.js
+echo 'Installing node and supported packages...'
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install PNPM and Yarn
+sudo npm install -g pnpm
+
+# Install Rust
+echo 'Installing Rust...'
+curl https://sh.rustup.rs -sSf | sh -s -- -y
+source ~/.bashrc
+
+# Install Foundry
+echo 'Installing Foundry...'
+
+# Create directories if they don't exist
+mkdir -p $HOME/.foundry/bin
+
+# Download foundryup
+curl -o $HOME/.foundry/bin/foundryup https://raw.githubusercontent.com/foundry-rs/foundry/master/foundryup/foundryup
+chmod +x $HOME/.foundry/bin/foundryup
+mkdir -p $HOME/.foundry/share/man/man1
+
+echo >> ~/.bashrc && echo "export PATH=\"\$PATH:$HOME/.foundry/bin\"" >> ~/.bashrc
+source ~/.bashrc
+
+# Add foundry bin directory to PATH only for this session
+export PATH="$PATH:$HOME/.foundry/bin"
+
+# Run foundryup
+#foundryup
+
+if command -v direnv >/dev/null 2>&1; then
+    echo 'direnv installed already'
+else
+    # Install direnv
+    sudo apt install direnv
+fi
+
+
+output_location="/var/optimism/packages/contracts-bedrock/deploy-config"
+
 # Function to check if a required parameter is missing
 function check_parameter {
     if [ -z "$2" ]; then
@@ -18,8 +86,6 @@ else
     echo "Error: .env file not found."
     exit 1
 fi
-
-output_location="/var/optimism/packages/contracts-bedrock/deploy-config"
 
 # Check required parameters
 check_parameter "CHAIN_NAME" "$CHAIN_NAME"
@@ -41,7 +107,7 @@ cd ~
 cd /var
 git clone https://github.com/ethereum-optimism/optimism.git
 cd optimism
-pnpm install
+echo "yes" | pnpm install
 make op-node op-batcher op-proposer
 
 foundryup
@@ -60,7 +126,6 @@ export ETH_RPC_URL="$ETH_RPC_URL"
 
 address_template="0xff000000000000000000000000000000000"
 address_length=42
-
 # Calculate the number of Xs
 num_x="${#CHAIN_ID}"
 if [[ $num_x -gt 0 ]]; then
@@ -76,7 +141,6 @@ if [[ $num_x -gt 0 ]]; then
                         remove_x+="?"
                 done
                 address_template="${address_template%$remove_x}"
-
         fi
 else
     echo "Invalid input for X. Exiting."
@@ -93,57 +157,61 @@ timestamp=$(echo "$output" | awk '/timestamp/ {print $2}')
 
 json_data=$(cat <<EOF
 {
-    "numDeployConfirmations": 1,
-    "finalSystemOwner": "$ADMIN_PUBLIC_ADDRESS",
-    "portalGuardian": "$ADMIN_PUBLIC_ADDRESS",
-    "controller": "$ADMIN_PUBLIC_ADDRESS",
-    "l1StartingBlockTag": "$blockhash",
-    "l1ChainID": 5,
-    "l2ChainID": $CHAIN_ID,
-    "l2BlockTime": 2,
-    "maxSequencerDrift": 600,
-    "sequencerWindowSize": 3600,
-    "channelTimeout": 300,
+  "numDeployConfirmations": 1,
 
-    "p2pSequencerAddress": "$SEQUENCER_PUBLIC_ADDRESS",
-    "batchInboxAddress": "$address",
-    "batchSenderAddress": "$BATCHER_PUBLIC_ADDRESS",
+  "finalSystemOwner": "$ADMIN_PUBLIC_ADDRESS",
+  "portalGuardian": "$ADMIN_PUBLIC_ADDRESS",
+  "controller": "$ADMIN_PUBLIC_ADDRESS",
 
-    "l2OutputOracleSubmissionInterval": 120,
-    "l2OutputOracleStartingBlockNumber": 0,
-    "l2OutputOracleStartingTimestamp": $timestamp,
+  "l1StartingBlockTag": "$blockhash",
 
-    "l2OutputOracleProposer": "$PROPOSER_PUBLIC_ADDRESS",
-    "l2OutputOracleChallenger": "$ADMIN_PUBLIC_ADDRESS",
+  "l1ChainID": 5,
+  "l2ChainID": $CHAIN_ID,
+  "l2BlockTime": 2,
 
-    "finalizationPeriodSeconds": 12,
+  "maxSequencerDrift": 600,
+  "sequencerWindowSize": 3600,
+  "channelTimeout": 300,
 
-    "proxyAdminOwner": "$ADMIN_PUBLIC_ADDRESS",
-    "baseFeeVaultRecipient": "$ADMIN_PUBLIC_ADDRESS",
-    "l1FeeVaultRecipient": "$ADMIN_PUBLIC_ADDRESS",
-    "sequencerFeeVaultRecipient": "$ADMIN_PUBLIC_ADDRESS",
+  "p2pSequencerAddress": "$SEQUENCER_PUBLIC_ADDRESS",
+  "batchInboxAddress": "$address",
+  "batchSenderAddress": "$BATCHER_PUBLIC_ADDRESS",
 
-    "baseFeeVaultMinimumWithdrawalAmount": "0x8ac7230489e80000",
-    "l1FeeVaultMinimumWithdrawalAmount": "0x8ac7230489e80000",
-    "sequencerFeeVaultMinimumWithdrawalAmount": "0x8ac7230489e80000",
-    "baseFeeVaultWithdrawalNetwork": 0,
-    "l1FeeVaultWithdrawalNetwork": 0,
-    "sequencerFeeVaultWithdrawalNetwork": 0,
+  "l2OutputOracleSubmissionInterval": 120,
+  "l2OutputOracleStartingBlockNumber": 0,
+  "l2OutputOracleStartingTimestamp": $timestamp,
 
-    "gasPriceOracleOverhead": 2100,
-    "gasPriceOracleScalar": 1000000,
+  "l2OutputOracleProposer": "$PROPOSER_PUBLIC_ADDRESS",
+  "l2OutputOracleChallenger": "$ADMIN_PUBLIC_ADDRESS",
 
-    "enableGovernance": true,
-    "governanceTokenSymbol": "OP",
-    "governanceTokenName": "Optimism",
-    "governanceTokenOwner": "$ADMIN_PUBLIC_ADDRESS",
+  "finalizationPeriodSeconds": 12,
 
-    "l2GenesisBlockGasLimit": "0x1c9c380",
-    "l2GenesisBlockBaseFeePerGas": "0x3b9aca00",
-    "l2GenesisRegolithTimeOffset": "0x0",
+  "proxyAdminOwner": "$ADMIN_PUBLIC_ADDRESS",
+  "baseFeeVaultRecipient": "$ADMIN_PUBLIC_ADDRESS",
+  "l1FeeVaultRecipient": "$ADMIN_PUBLIC_ADDRESS",
+  "sequencerFeeVaultRecipient": "$ADMIN_PUBLIC_ADDRESS",
 
-    "eip1559Denominator": 50,
-    "eip1559Elasticity": 10
+  "baseFeeVaultMinimumWithdrawalAmount": "0x8ac7230489e80000",
+  "l1FeeVaultMinimumWithdrawalAmount": "0x8ac7230489e80000",
+  "sequencerFeeVaultMinimumWithdrawalAmount": "0x8ac7230489e80000",
+  "baseFeeVaultWithdrawalNetwork": 0,
+  "l1FeeVaultWithdrawalNetwork": 0,
+  "sequencerFeeVaultWithdrawalNetwork": 0,
+
+  "gasPriceOracleOverhead": 2100,
+  "gasPriceOracleScalar": 1000000,
+
+  "enableGovernance": true,
+  "governanceTokenSymbol": "OP",
+  "governanceTokenName": "Optimism",
+  "governanceTokenOwner": "$ADMIN_PUBLIC_ADDRESS",
+
+  "l2GenesisBlockGasLimit": "0x1c9c380",
+  "l2GenesisBlockBaseFeePerGas": "0x3b9aca00",
+  "l2GenesisRegolithTimeOffset": "0x0",
+
+  "eip1559Denominator": 50,
+  "eip1559Elasticity": 10
 }
 EOF
 )
@@ -286,5 +354,6 @@ echo "Running Proposer"
 
 nohup ./bin/op-proposer     --poll-interval=12s     --rpc.port=8560     --rollup-rpc=http://localhost:8547     --l2oo-address=$L2OO_ADDR     --private-key=$PROPOSER_KEY     --l1-eth-rpc=$L1_RPC &
 
-echo "Your OPStack chain $CHAIN_NAME created successfully"
+
+echo "Your OPStack chain ($CHAIN_NAME) created successfully"
 echo "RPC is running in the PORT 8545"
