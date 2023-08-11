@@ -43,8 +43,22 @@ source ~/.bashrc
 
 # Install Foundry
 echo 'Installing Foundry...'
-curl -L https://foundry.paradigm.xyz | bash
+#curl -L https://foundry.paradigm.xyz | bash
+#source ~/.bashrc
+# Create directories if they don't exist
+mkdir -p $HOME/.foundry/bin
+
+# Download foundryup
+curl -o $HOME/.foundry/bin/foundryup https://raw.githubusercontent.com/foundry-rs/foundry/master/foundryup/foundryup
+chmod +x $HOME/.foundry/bin/foundryup
+mkdir -p $HOME/.foundry/share/man/man1
+
+echo >> ~/.bashrc && echo "export PATH=\"\$PATH:$HOME/.foundry/bin\"" >> ~/.bashrc
 source ~/.bashrc
+
+# Add foundry bin directory to PATH only for this session
+export PATH="$PATH:$HOME/.foundry/bin"
+
 
 if command -v direnv >/dev/null 2>&1; then
     echo 'direnv installed already'
