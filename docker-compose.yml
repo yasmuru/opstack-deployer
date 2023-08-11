@@ -4,6 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - GOROOT=/usr/lib/go
+      - PATH=$PATH:/root/.foundry/bin
     volumes:
       - ./deploy-scripts/setup.sh:/app/setup.sh
     command: /app/setup.sh
