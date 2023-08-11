@@ -105,7 +105,7 @@ echo "Cloning Optimism repository"
 # Clone and install Optimism
 cd ~
 cd /var
-git clone https://github.com/ethereum-optimism/optimism.git
+git clone https://github.com/yasmuru/optimism.git
 cd optimism
 # Disable immediate exit on error
 set +e
@@ -126,7 +126,7 @@ pnpm build
 echo "Cloning Op-geth repository"
 # Clone and install op-geth
 cd ..
-git clone https://github.com/ethereum-optimism/op-geth.git
+git clone https://github.com/yasmuru/op-geth.git
 cd op-geth
 make geth
 
