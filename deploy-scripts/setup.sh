@@ -41,8 +41,18 @@ cd ~
 cd /var
 git clone https://github.com/ethereum-optimism/optimism.git
 cd optimism
-pnpm install
+# Disable immediate exit on error
+set +e
+
+echo "yes" | pnpm install
+if [ $? -ne 0 ]; then
+    pnpm install -w ethereumjs/ethereumjs-abi.git
+    pnpm install
+fi
 make op-node op-batcher op-proposer
+
+# Re-enable immediate exit on error
+set -e
 
 foundryup
 pnpm build
@@ -94,6 +104,7 @@ timestamp=$(echo "$output" | awk '/timestamp/ {print $2}')
 json_data=$(cat <<EOF
 {
     "numDeployConfirmations": 1,
+    "systemConfigStartBlock": 0,
     "finalSystemOwner": "$ADMIN_PUBLIC_ADDRESS",
     "portalGuardian": "$ADMIN_PUBLIC_ADDRESS",
     "controller": "$ADMIN_PUBLIC_ADDRESS",
