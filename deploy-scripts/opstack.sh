@@ -168,7 +168,7 @@ timestamp=$(echo "$output" | awk '/timestamp/ {print $2}')
 json_data=$(cat <<EOF
 {
   "numDeployConfirmations": 1,
-  "systemConfigStartingBlock": 0,
+  "systemConfigStartBlock": 0,
   "finalSystemOwner": "$ADMIN_PUBLIC_ADDRESS",
   "portalGuardian": "$ADMIN_PUBLIC_ADDRESS",
   "controller": "$ADMIN_PUBLIC_ADDRESS",
