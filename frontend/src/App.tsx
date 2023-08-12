@@ -22,7 +22,7 @@ export function App() {
         </div>
       </div>
       <div className="bg-custom-gradient h-[calc(100vh-64px)]">
-        <div className="pt-14 h-full">
+        <div className="pt-14 h-full overflow-y-auto">
           {isConnected ? (
             <>
               <Setup />

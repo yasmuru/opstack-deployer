@@ -66,7 +66,7 @@ function Step2({ address, setAddress, createFlagAtom }: any) {
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-6 shadow-2xl mt-6">
+        <div className="bg-white rounded-2xl p-6 shadow-2xl mt-6 mb-8">
           <div className="py-4 grid grid-cols-1 md:grid-cols-2 gap-4 pb-1.5">
             <div className="w-full ">
               <label

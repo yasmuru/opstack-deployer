@@ -53,7 +53,7 @@ function FooterButtons({
                     </button>
                     )}
                     {currStep == 2 && (
-                        <button className="mx-2 rounded-full border bg-black hover:bg-white text-white hover:text-black font-semibold py-2 px-4 ">
+                        <button className="ml-2 rounded-full border bg-black hover:bg-white text-white hover:text-black font-semibold py-2 px-4 ">
                             Finish
                         </button>
                     )}
