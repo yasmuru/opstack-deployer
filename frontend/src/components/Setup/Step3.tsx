@@ -111,7 +111,7 @@ function Step3({ addressFromStorage, fields }: any) {
                     <p className="mb-4 text-lg font-bold font-sans text-[#101521CC]">
                     Run the Scripts
                     </p>
-                    <p className="text-sm font-sans text-[#101521CC] my-4">You can manually run the scripts or run it through docker. Make sure you have updated .env with proper values and deposited required ETH.</p>
+                    <p className="text-sm font-sans text-[#101521CC] my-4">You have the option to either manually execute the scripts or run them through Docker. Ensure that you have updated the .env file with the correct values and have deposited the necessary amount of ETH.</p>
                     <p className="text-md font-sans text-[#101521CC] my-4">For manual</p>
 
                     <CopyBlock
@@ -166,7 +166,7 @@ function Step3({ addressFromStorage, fields }: any) {
                         using the RPC end points as <b>host:8545</b> along with chain id used earlier while running the script.
                     </p>
                     <br></br>
-                    <p>Once the chain is successfully created, you will receive the L1 bridge proxy address as the output. You can then send a small amount of ETH (0.1 or less) to that bridge proxy address, and it will be bridged to your L2 Chain.</p>
+                    <p>After the chain is successfully created, you will receive the L1 bridge proxy address as the output. You can then send a small amount of ETH (0.1 or less) to that bridge proxy address, and it will be bridged to your L2 Chain.</p>
                     <br></br>
                     <p>
                         The best way to submit feedback and report bugs is to

@@ -41,14 +41,63 @@ PROPOSER_PRIVATE_KEY="Properser private key"
 
 ## Step 3 - Run opstack script
 
-After creating the environment file, run the script using:
+You have the option to either manually execute the scripts or run them through Docker. Ensure that you have updated the .env file with the correct values and have deposited the necessary amount of ETH.
+
+For Manual, 
 ```
-bash ./opstack.sh
-or
+cd deployer-scripts 
 ./opstack.sh
 ```
+For Docker,
+Make sure you have installed docker and docker-compose.
 
+If docker not installed, for ubuntu
+```
+apt install docker.io
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose 
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+```
+docker-compose up --build
+```
 
 ## L2 Chain Deployed Successfully
 
-Once the script runs successfully you can now see the new chain up and running in the port **8545**. You can access it by using the RPC end points as `host:8545` along with chain id used earlier while running the script.
+Once the script runs successfully you can now see the new chain up and running in the port 8545. You can access it by using the RPC end points as `host:8545` along with chain id used earlier while running the script.
+
+After the chain is successfully created, you will receive the L1 bridge proxy address as the output. You can then send a small amount of ETH (0.1 or less) to that bridge proxy address, and it will be bridged to your L2 Chain.
+
+
+## Setup Blockscout Explorer _(Optional)_
+For setting up the explorer for the new l2 chain launched, Please follow setps below 
+
+Lets, clone the blockscout explorer 
+```
+git clone https://github.com/blockscout/blockscout/
+cd blocksout/docker-compose/
+```
+
+We can modify the environment variables here, 
+
+```
+vim blockscout/docker-compose/envs/common-blockscout.env
+or 
+nano blockscout/docker-compose/envs/common-blockscout.env
+```
+You can refer to the below values in the environment file
+```
+
+ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545/
+ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:8545/
+INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER: "true"
+SUBNETWORK: "Blocktheory"
+PORT: 4000
+```
+Once the environment variables are set. You can run the docker-compose
+
+```
+docker-compose up --build -d
+```
+
+Now, you can access the blocksout explorer in port **4000**. You can access it by using the end point as `host:4000`
