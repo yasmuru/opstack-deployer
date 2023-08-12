@@ -178,7 +178,7 @@ json_data=$(cat <<EOF
   "l1ChainID": 5,
   "l2ChainID": $CHAIN_ID,
   "l2BlockTime": 2,
-
+  "l1BlockTime": 3,
   "maxSequencerDrift": 600,
   "sequencerWindowSize": 3600,
   "channelTimeout": 300,
