@@ -367,3 +367,9 @@ nohup ./bin/op-proposer     --poll-interval=12s     --rpc.port=8560     --rollup
 
 echo "Your OPStack chain ($CHAIN_NAME) created successfully"
 echo "RPC is running in the PORT 8545"
+
+cd /var/optimism/packages/contracts-bedrock
+
+echo "Here is your  L1 bridge proxy contract address, send some ETH from your L1 wallet and it will be bridged to your L2 in few mins"
+
+cat deployments/$file_name_format/L1StandardBridgeProxy.json | jq -r .address
