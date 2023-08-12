@@ -10,7 +10,7 @@ function Step3({ addressFromStorage, fields }: any) {
         </h1>
         <p className="font-medium text-base text-[#797F8A] mb-8">
             Please follow the below instructions to complete the deployment of your
-            OP Stack Chain.
+            OPStack Chain.
         </p>
         <div className="mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl">
             <div className="grid gap-6 row-gap-10">
@@ -58,8 +58,9 @@ function Step3({ addressFromStorage, fields }: any) {
                     <p className="mb-4 text-lg font-bold font-sans text-[#101521CC]">
                     Clone the Repository
                     </p>
+                    <p className="text-sm font-sans text-[#101521CC] my-4">Once you've logged into the server, clone our repository.</p>
                     <CopyBlock
-                    text={`git clone https://github.com/yasmuru/opstack-deployer \ncd opstack-setup-script\n`}
+                    text={`git clone https://github.com/yasmuru/opstack-deployer \ncd opstack-deployer\n`}
                     language={"bash"}
                     codeBlock
                     theme={dracula}
@@ -90,7 +91,7 @@ function Step3({ addressFromStorage, fields }: any) {
                         address?.proposer?.publicAddr || ""
                     }			\nPROPOSER_PRIVATE_KEY=${
                         address?.proposer?.privateKey || ""
-                    }`}
+                    }\nRPC_KIND=any`}
                     codeBlock
                     theme={dracula}
                     showLineNumbers={false}
@@ -110,42 +111,39 @@ function Step3({ addressFromStorage, fields }: any) {
                     <p className="mb-4 text-lg font-bold font-sans text-[#101521CC]">
                     Run the Scripts
                     </p>
+                    <p className="text-sm font-sans text-[#101521CC] my-4">You can manually run the scripts or run it through docker. Make sure you have updated .env with proper values and deposited required ETH.</p>
+                    <p className="text-md font-sans text-[#101521CC] my-4">For manual</p>
 
                     <CopyBlock
                     language="bash"
-                    text={`bash ./initial.sh\n or\n./initial.sh`}
+                    text={`cd deployer-scripts \n./opstack.sh`}
                     codeBlock
                     theme={dracula}
                     showLineNumbers={false}
                     />
 
-                    <p className="text-sm font-sans text-[#101521CC] my-4">
-                    Once initial.sh script runs successfully,
-                    <br />
-                    We can refresh the terminal using
-                    <code className="card p-[0.25rem] rounded-[0.25rem] text-[#f8f8f2] bg-[#282a36] ml-1">
-                        {" "}
-                        source ~/.bashrc
-                    </code>
-                    <br />
-                    Then we can run the setup / final script with below command
-                    </p>
+                    <p className="text-md font-sans text-[#101521CC] my-4">For docker</p>
+                    <p className="text-sm font-sans text-[#101521CC] my-4">Make sure you have installed docker and docker-compose.</p>
+
+                    {/* <p className="text-sm font-sans text-[#101521CC] my-4">If docker not installed, for ubuntu</p>
+                    <CopyBlock
+                    language="bash"
+                    text={`apt install docker.io \nsudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \nsudo chmod +x /usr/local/bin/docker-compose`}
+                    codeBlock
+                    theme={dracula}
+                    showLineNumbers={false}
+                    /> */}
+                    
+                    {/* <p className="text-sm font-sans text-[#101521CC] my-4">then you can build and run docker as follows</p> */}
 
                     <CopyBlock
                     language="bash"
-                    text={`bash ./setup.sh\nor\n./setup.sh`}
+                    text={`docker-compose up --build`}
                     codeBlock
                     theme={dracula}
                     showLineNumbers={false}
                     />
-
-                    {/* <div className="bg-black p-3 text-white">
-                        bash ./setup.sh\nor\n./setup.sh
-                        </div> */}
-                    <ul className="text-sm font-sans text-[#101521CC] my-4">
-                    <li>Performs Initializes the OP Stack Starts</li>
-                    <li>The OP Stack</li>
-                    </ul>
+                    
                 </div>
                 </div>
                 <div className="flex">
@@ -165,8 +163,12 @@ function Step3({ addressFromStorage, fields }: any) {
                     <p>
                         Once the script runs successfully you can now see the new
                         chain up and running in the port 8545. You can access it by
-                        using the RPC end points as <code>host:8454</code>
-                        along with chain id used earlier while running the script.
+                        using the RPC end points as <b>host:8545</b> along with chain id used earlier while running the script.
+                    </p>
+                    <br></br>
+                    <p>Once the chain is successfully created, you will receive the L1 bridge proxy address as the output. You can then send a small amount of ETH (0.1 or less) to that bridge proxy address, and it will be bridged to your L2 Chain.</p>
+                    <br></br>
+                    <p>
                         The best way to submit feedback and report bugs is to
                         <a
                         href="https://github.com/yasmuru/opstack-deployer/issues"
