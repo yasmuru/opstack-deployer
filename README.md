@@ -16,7 +16,7 @@ _Cloud Service Options_: You have the flexibility to use any cloud service provi
 ```
 git clone https://github.com/yasmuru/opstack-deployer
 // navigate to the deploy script folder
-cd opstack-deployer/deploy-scripts
+cd opstack-deployer/
 ```
 
 ## Step 2 - Create your environment file
@@ -39,31 +39,15 @@ PROPOSER_PRIVATE_KEY="Properser private key"
 - Proposer: 5 ETH
 - Batcher: 10 ETH
 
-## Step 3 - Run initial script
-After creating the environment file, run the initial script using:
-```
-bash ./initial.sh
-or
-./initial.sh
-```
-#### script initial.sh performs
-* Installs the necessary dependencies
-* Creates the necessary directories
-* Downloads the OP Stack Code
+## Step 3 - Run opstack script
 
-## Step 4
-Once initial.sh script runs successfully, We can refresh the terminal using command 
-`source ~/.bashrc`
-
-Then we can run the setup / final script with below command 
+After creating the environment file, run the script using:
 ```
-bash ./setup.sh
+bash ./opstack.sh
 or
-./setup.sh
+./opstack.sh
 ```
-#### script setup.sh performs
-* Initializes the OP Stack
-* Starts the OP Stack
+
 
 ## L2 Chain Deployed Successfully
 

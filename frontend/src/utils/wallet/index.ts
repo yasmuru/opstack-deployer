@@ -16,17 +16,17 @@ export class Wallet {
 
     constructor(_walletCore: WalletCore, _tw = TW) {
         const {
-            HDWallet,
-            CoinType,
-            AnySigner,
-            HexCoding,
-            PublicKey,
-            PrivateKey,
-            Mnemonic,
-            Curve,
-            AnyAddress,
-            SolanaAddress,
-            StoredKey,
+        HDWallet,
+        CoinType,
+        AnySigner,
+        HexCoding,
+        PublicKey,
+        PrivateKey,
+        Mnemonic,
+        Curve,
+        AnyAddress,
+        SolanaAddress,
+        StoredKey,
         } = _walletCore;
         this.CoinType = CoinType;
         this.AnySigner = AnySigner;
@@ -52,38 +52,38 @@ export class Wallet {
         const coinType = this.getCoinType(chainId);
         let prvKey = this.PrivateKey.create();
         try {
-            prvKey = this.PrivateKey.createWithData(
-                this.HexCoding.decode(_privateKey),
-            );
+        prvKey = this.PrivateKey.createWithData(
+            this.HexCoding.decode(_privateKey),
+        );
         } catch (e) {
-            console.log(e);
+        console.log(e);
         }
         let pubKey = prvKey?.getPublicKeyCurve25519();
         switch (_curve) {
-            case this.Curve.secp256k1:
-                pubKey = prvKey.getPublicKeySecp256k1(false);
-                break;
-            case this.Curve.ed25519:
-                pubKey = prvKey.getPublicKeyEd25519();
-                break;
-            case this.Curve.ed25519Blake2bNano:
-                pubKey = prvKey.getPublicKeyEd25519Blake2b();
-                break;
-            case this.Curve.curve25519:
-                pubKey = prvKey.getPublicKeyCurve25519();
-                break;
-            case this.Curve.nist256p1:
-                pubKey = prvKey.getPublicKeyNist256p1();
-                break;
-            case this.Curve.ed25519ExtendedCardano:
-                pubKey = prvKey.getPublicKeyEd25519Cardano();
-                break;
-            default:
-                break;
+        case this.Curve.secp256k1:
+            pubKey = prvKey.getPublicKeySecp256k1(false);
+            break;
+        case this.Curve.ed25519:
+            pubKey = prvKey.getPublicKeyEd25519();
+            break;
+        case this.Curve.ed25519Blake2bNano:
+            pubKey = prvKey.getPublicKeyEd25519Blake2b();
+            break;
+        case this.Curve.curve25519:
+            pubKey = prvKey.getPublicKeyCurve25519();
+            break;
+        case this.Curve.nist256p1:
+            pubKey = prvKey.getPublicKeyNist256p1();
+            break;
+        case this.Curve.ed25519ExtendedCardano:
+            pubKey = prvKey.getPublicKeyEd25519Cardano();
+            break;
+        default:
+            break;
         }
         const generatedAddress = this.AnyAddress.createWithPublicKey(
-            pubKey,
-            coinType,
+        pubKey,
+        coinType,
         ).description();
         return generatedAddress;
     };
@@ -97,30 +97,30 @@ export class Wallet {
         return { publicAddr: address, privateKey: pvtKeyHex };
     };
 
-  // Not required to use this
+    // Not required to use this
 
     trimZeroHex = (zeroHex: string) => {
         if (zeroHex.startsWith("0x")) {
-            return zeroHex.slice(2, zeroHex.length);
+        return zeroHex.slice(2, zeroHex.length);
         }
         return zeroHex;
     };
 
     getCurve = (curve: string) => {
         switch (curve) {
-            case "secp256k1":
-                return this.Curve.secp256k1;
-            case "ed25519Blake2bNano":
-                return this.Curve.ed25519Blake2bNano;
-            case "curve25519":
-                return this.Curve.curve25519;
-            case "nist256p1":
-                return this.Curve.nist256p1;
-            case "ed25519ExtendedCardano":
-                return this.Curve.ed25519ExtendedCardano;
-            case "ed25519":
-                return this.Curve.ed25519;
-            default:
+        case "secp256k1":
+            return this.Curve.secp256k1;
+        case "ed25519Blake2bNano":
+            return this.Curve.ed25519Blake2bNano;
+        case "curve25519":
+            return this.Curve.curve25519;
+        case "nist256p1":
+            return this.Curve.nist256p1;
+        case "ed25519ExtendedCardano":
+            return this.Curve.ed25519ExtendedCardano;
+        case "ed25519":
+            return this.Curve.ed25519;
+        default:
             return this.Curve.secp256k1;
         }
     };
@@ -128,20 +128,20 @@ export class Wallet {
     getCoinType = (chainId: string) => {
         const coinType = this.CoinType;
         switch (chainId) {
-            case "ethereum":
-                return coinType.ethereum;
-            case "bsc":
-                return coinType.smartChain;
-            case "polygon":
-                return coinType.polygon;
-            case "solana":
-                return coinType.solana;
-            case "zkevm":
-                return coinType.polygonzkEVM;
-            case "zksync":
-                return coinType.zksync;
-            default:
-                return coinType.ethereum;
+        case "ethereum":
+            return coinType.ethereum;
+        case "bsc":
+            return coinType.smartChain;
+        case "polygon":
+            return coinType.polygon;
+        case "solana":
+            return coinType.solana;
+        case "zkevm":
+            return coinType.polygonzkEVM;
+        case "zksync":
+            return coinType.zksync;
+        default:
+            return coinType.ethereum;
         }
     };
 

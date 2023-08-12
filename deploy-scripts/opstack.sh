@@ -82,6 +82,8 @@ function check_parameter {
 # Load the .env file if it exists
 if [ -f .env ]; then
     source .env
+elif [ -f ../.env ]; then
+    source ../.env
 else
     echo "Error: .env file not found."
     exit 1
