@@ -1,6 +1,8 @@
 # Launch OP Stack L2 Chain
 Our repository contains deployment scripts that facilitate the seamless setup and launch of the L2 Optimism chain, built on the robust opstack platform. Our aim is to simplify the L2 chain deployment process, allowing developers and users to effortlessly experience the power and potential of the L2 Optimism solution. With our user-friendly scripts, you can quickly configure and deploy the L2 chain.
 
+**Visit [opstack-deployer.vercel.app](https://opstack-deployer.vercel.app/)**: You can start the chain setup by visiting [opstack-deployer.vercel.app](https://opstack-deployer.vercel.app/), where you'll find all the necessary resources and documentation or you can follow the steps in below.
+
 _Hardware Requirements_: Ensure that you have the following hardware specifications
 
 ```
