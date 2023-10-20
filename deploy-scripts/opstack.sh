@@ -107,7 +107,12 @@ echo "Cloning Optimism repository"
 # Clone and install Optimism
 cd ~
 cd /var
-git clone https://github.com/yasmuru/optimism.git
+directory="/var/optimism"
+if [ -d "$directory" ]; then
+    echo "Optimism repository cloned already!"
+else
+    git clone --recurse-submodules https://github.com/ethereum-optimism/optimism.git
+fi
 cd optimism
 # Disable immediate exit on error
 set +e
@@ -128,7 +133,12 @@ pnpm build
 echo "Cloning Op-geth repository"
 # Clone and install op-geth
 cd ..
-git clone https://github.com/yasmuru/op-geth.git
+directory="/var/op-geth"
+if [ -d "$directory" ]; then
+    echo "Op-geth repository exists!"
+else
+    git clone https://github.com/ethereum-optimism/op-geth.git
+fi
 cd op-geth
 make geth
 
@@ -169,18 +179,16 @@ timestamp=$(echo "$output" | awk '/timestamp/ {print $2}')
 
 json_data=$(cat <<EOF
 {
-  "numDeployConfirmations": 1,
   "systemConfigStartBlock": 0,
   "finalSystemOwner": "$ADMIN_PUBLIC_ADDRESS",
   "portalGuardian": "$ADMIN_PUBLIC_ADDRESS",
-  "controller": "$ADMIN_PUBLIC_ADDRESS",
 
   "l1StartingBlockTag": "$blockhash",
 
   "l1ChainID": 5,
   "l2ChainID": $CHAIN_ID,
   "l2BlockTime": 2,
-  "l1BlockTime": 3,
+  "l1BlockTime": 12,
   "maxSequencerDrift": 600,
   "sequencerWindowSize": 3600,
   "channelTimeout": 300,
@@ -223,7 +231,9 @@ json_data=$(cat <<EOF
   "l2GenesisRegolithTimeOffset": "0x0",
 
   "eip1559Denominator": 50,
-  "eip1559Elasticity": 10
+  "eip1559Elasticity": 10,
+  "requiredProtocolVersion": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "recommendedProtocolVersion": "0x0000000000000000000000000000000000000000000000000000000000000000"
 }
 EOF
 )
@@ -265,12 +275,14 @@ update_env_variable "DEPLOYMENT_CONTEXT" "$file_name_format"
 update_env_variable "PRIVATE_KEY" "$ADMIN_PRIVATE_KEY"
 update_env_variable "L1_RPC" "$ETH_RPC_URL"
 update_env_variable "RPC_KIND" "$RPC_KIND"
+update_env_variable "IMPL_SALT" "a"
 
 export ETH_RPC_URL=$ETH_RPC_URL
 export DEPLOYMENT_CONTEXT=$file_name_format
 export PRIVATE_KEY=$ADMIN_PRIVATE_KEY
 export L1_RPC=$ETH_RPC_URL
 export RPC_KIND=$RPC_KIND
+export IMPL_SALT="a"
 
 source ~/.bashrc
 direnv allow .
