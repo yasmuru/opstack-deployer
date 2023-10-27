@@ -36,6 +36,8 @@ check_parameter "BATCHER_PRIVATE_KEY" "$BATCHER_PUBLIC_ADDRESS"
 check_parameter "PROPOSER_PUBLIC_ADDRESS" "$PROPOSER_PUBLIC_ADDRESS"
 check_parameter "PROPOSER_PRIVATE_KEY" "$PROPOSER_PRIVATE_KEY"
 check_parameter "RPC_KIND" "$RPC_KIND"
+check_parameter "MONOREPO_VER" "$MONOREPO_VER"
+check_parameter "OP_GETH_VER" "$OP_GETH_VER"
 
 echo "Cloning Optimism repository"
 # Clone and install Optimism
@@ -48,6 +50,7 @@ else
     git clone --recurse-submodules https://github.com/ethereum-optimism/optimism.git
 fi
 cd optimism
+git checkout $MONOREPO_VER
 # Disable immediate exit on error
 set +e
 
@@ -74,6 +77,7 @@ else
     git clone https://github.com/ethereum-optimism/op-geth.git
 fi
 cd op-geth
+git checkout $OP_GETH_VER
 make geth
 
 # Set ETH_RPC_URL environment variable
